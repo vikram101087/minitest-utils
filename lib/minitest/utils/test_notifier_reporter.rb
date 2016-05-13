@@ -5,13 +5,13 @@ module Minitest
         super
 
         stats = TestNotifier::Stats.new(:minitest, {
-          count: count,
-          assertions: assertions,
-          failures: failures,
-          errors: errors
+          :count => count,
+          :assertions => assertions,
+          :failures => failures,
+          :errors => errors
         })
 
-        TestNotifier.notify(status: stats.status, message: stats.message)
+        TestNotifier.notify(:status => stats.status, :message => stats.message)
       end
     end
   end

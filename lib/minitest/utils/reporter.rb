@@ -9,10 +9,10 @@ module Minitest
       }
 
       COLOR = {
-        red: 31,
-        green: 32,
-        yellow: 33,
-        blue: 34
+        :red => 31,
+        :green => 32,
+        :yellow => 33,
+        :blue => 34
       }
 
       def initialize(*)
@@ -27,7 +27,7 @@ module Minitest
 
       def start
         super
-        io.puts "Run options: #{options[:args]}"
+        io.puts "Run :options => #{options[:args]}"
         io.puts
         io.puts "# Running:"
         io.puts
@@ -45,8 +45,8 @@ module Minitest
         color = :red if failing_results.any?
 
         if failing_results.any? || skipped_results.any?
-          failing_results.each.with_index(1) {|result, index| display_failing(result, index) }
-          skipped_results.each.with_index(failing_results.size + 1) {|result, index| display_skipped(result, index) }
+          failing_results.each_with_index {|result, index| display_failing(result, index+1) }
+          skipped_results.each_with_index {|result, index| display_skipped(result, index + failing_results.size + 1) }
         end
 
         io.print "\n\n"
@@ -84,7 +84,7 @@ module Minitest
       def display_failing(result, index)
         backtrace = backtrace(result.failure.backtrace)
         message = result.failure.message
-        message = message.lines.tap(&:pop).join.chomp if result.error?
+        message = message.lines.to_a.tap(&:pop).join.chomp if result.error?
 
         str = "\n\n"
         str << color("%4d) %s" % [index, result_name(result.name)])
@@ -113,10 +113,10 @@ module Minitest
       end
 
       def find_test_file(result)
-        filter_backtrace(result.failure.backtrace)
-          .find {|line| line.match(%r((test|spec)/.*?_(test|spec).rb)) }
-          .to_s
-          .gsub(/:\d+.*?$/, "")
+        filter_backtrace(result.failure.backtrace).
+          find {|line| line.match(%r((test|spec)/.*?_(test|spec).rb)) }.
+          to_s.
+          gsub(/:\d+.*?$/, "")
       end
 
       def backtrace(backtrace)
@@ -139,9 +139,9 @@ module Minitest
       end
 
       def result_name(name)
-        name
-          .gsub(/^test(_\d+)?_/, "")
-          .gsub(/_/, " ")
+        name.
+          gsub(/^test(_\d+)?_/, "").
+          gsub(/_/, " ")
       end
 
       def print_result_code(result_code)
